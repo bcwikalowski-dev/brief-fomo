@@ -136,6 +136,9 @@
   .submit:active{transform:translateY(1px)}
   .submit[disabled]{opacity:.6;cursor:default}
   .submit-msg{margin:1rem 0 0;font-size:.95rem;color:var(--muted)}
+  .copy-alt{display:inline-block;margin-top:1rem;background:none;border:none;padding:0;cursor:pointer;
+    font-family:var(--sans);font-size:.9rem;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+  .copy-alt:hover{color:var(--fg)}
 
   a:focus-visible,button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
 
@@ -269,9 +272,10 @@
   </section>
 
   <section class="submit-area">
-    <p class="savenote">Zapisuje się automatycznie w tej przeglądarce. Jak skończycie — kliknijcie poniżej; całość skopiuje się do schowka, wklejcie mi ją w mailu albo na Slacku.</p>
-    <button class="submit" id="saveBtn" type="button">Skopiuj odpowiedzi</button>
+    <p class="savenote">Jak skończycie, kliknijcie „Wyślij" — odpowiedzi trafią prosto do mnie. Zapisują się też na bieżąco w tej przeglądarce, więc nic nie zginie.</p>
+    <button class="submit" id="sendBtn" type="button">Wyślij odpowiedzi</button>
     <p class="submit-msg" id="saveMsg" hidden></p>
+    <button class="copy-alt" id="copyBtn" type="button">albo skopiuj i wyślij ręcznie</button>
   </section>
 
   <footer>
@@ -325,32 +329,52 @@
     return out.join('\n');
   }
 
-  var btn=document.getElementById('saveBtn');
+  var ENDPOINT='https://formspree.io/f/mnpjjqyk';
+  var sendBtn=document.getElementById('sendBtn');
+  var copyBtn=document.getElementById('copyBtn');
   var msg=document.getElementById('saveMsg');
   function show(t){ if(msg){ msg.textContent=t; msg.hidden=false; } }
 
-  function done(ok){
+  // --- Wysyłka przez Formspree ---
+  if(sendBtn){
+    var label=sendBtn.textContent;
+    sendBtn.addEventListener('click',function(){
+      sendBtn.disabled=true; sendBtn.textContent='Wysyłam…';
+      fetch(ENDPOINT,{
+        method:'POST',
+        headers:{'Accept':'application/json','Content-Type':'application/json'},
+        body:JSON.stringify({ _subject:'Brief FOMO — nowe odpowiedzi', odpowiedzi:reportText() })
+      }).then(function(r){
+        if(r.ok){
+          show('Wysłane ✓ — dzięki! Odpowiedzi już do mnie dotarły. Resztę dogramy na callu.');
+          sendBtn.textContent='Wysłane ✓';
+        } else { throw new Error('bad status'); }
+      }).catch(function(){
+        sendBtn.disabled=false; sendBtn.textContent=label;
+        show('Nie udało się wysłać. Kliknijcie „albo skopiuj i wyślij ręcznie" poniżej i wklejcie mi odpowiedzi w mailu.');
+      });
+    });
+  }
+
+  // --- Kopiowanie (awaryjne) ---
+  function copied(ok){
     show(ok
-      ? 'Skopiowane do schowka ✓ — wklejcie mi je teraz w mailu albo na Slacku.'
-      : 'Zaznaczyłem tekst w ramce poniżej — skopiujcie go ręcznie (Ctrl/Cmd+C) i wyślijcie mi go.');
-    if(btn){ var l=btn.getAttribute('data-label')||'Skopiuj odpowiedzi';
-      btn.textContent=ok?'Skopiowane ✓':l;
-      setTimeout(function(){btn.textContent=l;},2600); }
+      ? 'Skopiowane do schowka ✓ — wklejcie mi je w mailu albo na Slacku.'
+      : 'Zaznaczyłem tekst — skopiujcie go ręcznie (Ctrl/Cmd+C) i wyślijcie mi go.');
   }
   function selectCopy(){
     try{
       var ta=document.createElement('textarea'); ta.value=reportText();
       ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
       document.body.appendChild(ta); ta.focus(); ta.select();
-      var ok=document.execCommand('copy'); document.body.removeChild(ta); done(ok);
-    }catch(e){ done(false); }
+      var ok=document.execCommand('copy'); document.body.removeChild(ta); copied(ok);
+    }catch(e){ copied(false); }
   }
-  if(btn){
-    btn.setAttribute('data-label',btn.textContent);
-    btn.addEventListener('click',function(){
+  if(copyBtn){
+    copyBtn.addEventListener('click',function(){
       var txt=reportText();
       if(navigator.clipboard&&navigator.clipboard.writeText){
-        navigator.clipboard.writeText(txt).then(function(){done(true);}).catch(function(){selectCopy();});
+        navigator.clipboard.writeText(txt).then(function(){copied(true);}).catch(function(){selectCopy();});
       } else { selectCopy(); }
     });
   }
