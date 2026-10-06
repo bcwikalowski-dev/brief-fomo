@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brief FOMO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: ciemny, redakcyjny brief w czerni/szarości/bieli. Nagłówki — cienki
+     serif (Playfair) wersalikami + znak ✱; grotesk na tekst, etykiety i pola.
+     Numerowane sekcje z polami do wypełnienia; dolny pasek z „Skopiuj odpowiedzi". */
+  :root{
+    --bg:#0C0C0D;
+    --panel:#141416;
+    --line:#2A2A2C;
+    --fg:#F2F1EC;
+    --muted:#98989C;
+    --faint:#4E4E52;
+    --display:"Playfair Display",Georgia,"Times New Roman",serif;
+    --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg);color:var(--fg);
+    font-family:var(--sans);font-size:1.0625rem;line-height:1.62;
+    -webkit-font-smoothing:antialiased;margin:0;overflow-x:hidden;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding-inline:clamp(20px,5vw,56px)}
+
+  .label{font-weight:600;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+  /* ---- pasek lockup ---- */
+  .bar{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+    background:rgba(12,12,13,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-block:.9rem}
+  .lockup{font-weight:600;font-size:.82rem;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+  .lockup b{color:var(--fg);font-weight:700;letter-spacing:.02em}
+  .lockup .x{opacity:.45;font-weight:400}
+
+  /* ---- hero ---- */
+  .hero{padding-block:clamp(3.4rem,10vw,6.5rem) clamp(2rem,5vw,3rem)}
+  .hero .label{display:block;margin-bottom:1.6rem}
+  h1{
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(2.3rem,6.6vw,5rem);
+    line-height:1.08;letter-spacing:.005em;text-transform:uppercase;
+    text-wrap:balance;margin:0;max-width:17ch;
+  }
+  h1 em{font-style:italic;font-weight:400}
+  h1 .soft{color:var(--muted);font-weight:400}
+  .lede{margin:1.9rem 0 0;font-size:clamp(1.08rem,2.2vw,1.35rem);color:var(--fg);max-width:50ch;line-height:1.5}
+  .byline{margin-top:2.4rem;color:var(--muted);font-size:.95rem}
+  .byline b{color:var(--fg);font-weight:600}
+
+  /* ---- intro ---- */
+  .intro{padding-block:clamp(1.6rem,4vw,2.4rem)}
+  .intro .big{font-family:var(--display);font-weight:500;font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.3;margin:0;max-width:22ch}
+  .intro .big .name{font-style:italic}
+  .intro .sub{margin:.9rem 0 0;color:var(--muted);font-size:1.02rem;max-width:48ch;line-height:1.5}
+
+  /* ---- panel: na czym budujemy ---- */
+  .panel{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:clamp(1.8rem,4vw,2.6rem);margin-top:1rem}
+  .panel .label{display:block;margin-bottom:1.6rem}
+  .agreed{list-style:none;margin:0;padding:0;display:grid;gap:1.05rem}
+  .agreed li{display:grid;grid-template-columns:1.4rem 1fr;gap:.6rem;align-items:start;font-size:1.0625rem;line-height:1.5;color:var(--muted)}
+  .agreed .mk{color:var(--fg);line-height:1.5}
+  .agreed b{color:var(--fg);font-weight:600}
+
+  /* ---- numerowane sekcje ---- */
+  .section{display:grid;grid-template-columns:6rem 1fr;gap:clamp(1.1rem,4vw,2.8rem);padding-block:clamp(2.6rem,5vw,3.6rem);border-top:1px solid var(--line)}
+  .num{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,4vw,2.8rem);color:var(--faint);line-height:1}
+  .section h2,.materials h2{
+    font-family:var(--display);font-weight:500;
+    font-size:clamp(1.7rem,4.4vw,2.9rem);line-height:1.08;
+    letter-spacing:.01em;text-transform:uppercase;margin:0;text-wrap:balance;
+  }
+  .frame{color:var(--muted);margin:.8rem 0 0;font-size:1.02rem;max-width:50ch}
+
+  .qs{margin:1.5rem 0 0}
+  .q{padding-block:1.25rem;border-top:1px solid var(--line)}
+  .q:first-child{border-top:none;padding-top:.3rem}
+  .qtext{margin:0;font-size:1.075rem;line-height:1.5}
+  .qtext .mk{color:var(--muted);margin-right:.5rem}
+  .qtext .hint{display:block;color:var(--muted);font-size:.93rem;margin-top:.3rem;padding-left:1.2rem}
+  textarea.ans{
+    display:block;width:100%;margin-top:.8rem;
+    background:rgba(255,255,255,.015);border:1px solid var(--line);border-radius:5px;
+    color:var(--fg);font-family:var(--sans);font-size:1rem;line-height:1.5;
+    padding:.65rem .8rem;min-height:2.9rem;resize:vertical;
+  }
+  textarea.ans::placeholder{color:var(--faint)}
+  textarea.ans:focus{outline:none;border-color:var(--muted);background:rgba(255,255,255,.03)}
+
+  /* ---- checklista ---- */
+  .materials{padding-block:clamp(2.6rem,5vw,3.6rem);border-top:1px solid var(--line)}
+  .materials .head{margin-bottom:1.6rem}
+  .materials .label{display:block;margin-bottom:.9rem}
+  .checklist{list-style:none;margin:0;padding:0}
+  .check{display:grid;grid-template-columns:20px 1fr;gap:1rem;align-items:start;padding-block:1rem;border-bottom:1px solid var(--line);cursor:pointer}
+  .checklist li:first-child .check{border-top:1px solid var(--line)}
+  .check input{width:18px;height:18px;margin:.15rem 0 0;flex:none;accent-color:var(--fg);cursor:pointer}
+  .check .ltext{font-size:1.075rem;line-height:1.45}
+  .check b{color:var(--fg);font-weight:600}
+  .check .note{display:block;color:var(--muted);font-size:.93rem;margin-top:.25rem}
+
+  /* ---- o autorze ---- */
+  .about{margin-top:clamp(2.6rem,5vw,3.6rem);border-top:1px solid var(--line);padding-block:clamp(2.2rem,5vw,3rem)}
+  .wordmark{font-family:var(--display);font-weight:600;font-size:2.4rem;letter-spacing:-.01em;color:var(--fg);line-height:1;margin:0 0 1.3rem}
+  .about p{margin:0;max-width:60ch;font-size:1.05rem;line-height:1.62;color:var(--muted)}
+  .about p b{color:var(--fg);font-weight:600}
+
+  /* ---- stopka ---- */
+  footer{padding-block:clamp(2.2rem,5vw,2.8rem);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;align-items:end}
+  .contact{font-size:.98rem;line-height:1.85}
+  .contact .label{display:block;margin-bottom:.45rem}
+  .contact a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--muted)}
+  .contact a:hover{border-bottom-color:var(--fg)}
+  .stamp{font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:right}
+
+  /* ---- obszar zapisu ---- */
+  .submit-area{padding-block:clamp(2.2rem,5vw,3rem);border-top:1px solid var(--line)}
+  .savenote{color:var(--muted);font-size:.95rem;margin:0 0 1.1rem;max-width:52ch}
+  .submit{
+    display:block;width:100%;
+    font-family:var(--sans);font-weight:600;font-size:.9rem;letter-spacing:.12em;text-transform:uppercase;
+    background:var(--fg);color:var(--bg);border:none;border-radius:5px;
+    padding:1.15rem 1.3rem;cursor:pointer;
+  }
+  .submit:hover{opacity:.9}
+  .submit:active{transform:translateY(1px)}
+  .submit[disabled]{opacity:.6;cursor:default}
+  .submit-msg{margin:1rem 0 0;font-size:.95rem;color:var(--muted)}
+
+  a:focus-visible,button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+
+  @media (max-width:640px){
+    .section{grid-template-columns:1fr;gap:.4rem}
+    .num{font-size:1.6rem}
+  }
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <div class="lockup"><b>FOMO</b>&#x2731;<span class="x">×</span><b>heksagraf</b></div>
+    <div class="label">Brief</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="label">Brief strony · 2026</span>
+    <h1>Motion zostaje <em>bohaterem</em>. <span class="soft">Strona robi resztę.</span></h1>
+    <p class="lede">Krótki brief, żeby ustawić nową stronę FOMO we właściwym kierunku — plus lista rzeczy do podesłania, żebyśmy ruszyli na serio.</p>
+    <p class="byline">Przygotował <b>Heksagraf</b> dla ekipy FOMO</p>
+  </section>
+
+  <section class="intro">
+    <p class="big"><span class="name">Miki, Robert</span> — tu zaczynamy.</p>
+    <p class="sub">Wpiszcie odpowiedzi prosto w polach i zaznaczcie, co macie. Na dole kliknijcie „Skopiuj odpowiedzi" i wklejcie mi je w mailu albo na Slacku — resztę dogramy na callu. Nie ma co nad tym ślęczeć.</p>
+  </section>
+
+  <section class="panel">
+    <span class="label">Na czym budujemy</span>
+    <ul class="agreed">
+      <li><span class="mk">&#x2731;</span><div>Obecna strona pokazuje reel i niewiele więcej. Nowa <b>zostawia realizacje na pierwszym planie</b> i dokłada trzy rzeczy, których brakuje.</div></li>
+      <li><span class="mk">&#x2731;</span><div><b>Jasny przekaz, co robicie</b>, łatwy kontakt i social proof poukładany tak, żeby realnie sprzedawał.</div></li>
+      <li><span class="mk">&#x2731;</span><div>Start jako <b>jeden landing</b> — potem rozrasta się w podstrony w miarę skalowania.</div></li>
+      <li><span class="mk">&#x2731;</span><div><b>Motion zostaje w centrum.</b> Szerszy digital dostaje wyraźne drzwi, bez rozmywania tego, z czego jesteście znani.</div></li>
+      <li><span class="mk">&#x2731;</span><div>Strona to <b>zaplecze wiarygodności pod social media</b> — miejsce, gdzie ląduje ktoś, kto chce sprawdzić, że jesteście konkretni.</div></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="num">01</div>
+    <div>
+      <h2>Kierunek</h2>
+      <p class="frame">Dokąd zmierza FOMO, żeby strona celowała w to samo.</p>
+      <div class="qs">
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Dokąd chcecie zabrać FOMO przez najbliższy rok — i jak daleko to od dzisiejszego studia? Spokojna ewolucja czy większy reset?</span></p><textarea class="ans" id="a01" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">„Iść szerzej" — nowe branże poza krypto i AI, nowe typy pracy poza motion, czy jedno i drugie?</span></p><textarea class="ans" id="a02" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Co strona ma sprawić? Jedna główna akcja — umówienie calla, wysłanie briefu, coś innego?</span></p><textarea class="ans" id="a03" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Po czym poznacie, że działa?</span><span class="hint">np. umówione calle, wartościowe leady, konkretny typ klienta, który się odzywa.</span></p><textarea class="ans" id="a04" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Kogo chcecie dosięgnąć, kogo obecni klienci i sieć kontaktów jeszcze wam nie przynoszą?</span></p><textarea class="ans" id="a05" placeholder="Wasza odpowiedź…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="num">02</div>
+    <div>
+      <h2>Pozycjonowanie i zespół</h2>
+      <p class="frame">Jak FOMO się pokazuje — jako studio, nie tylko reel.</p>
+      <div class="qs">
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Jak ma być odbierane FOMO: jeden człowiek, zwarte studio, czy studio z zapleczem ludzi?</span><span class="hint">To przesądza, jak pokazujemy zespół, skalę i sekcję „O nas".</span></p><textarea class="ans" id="a06" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Z Robertem na pokładzie i kolejnymi designerami w drodze — ile z historii „umiemy się skalować" ma nieść strona teraz, a ile później?</span></p><textarea class="ans" id="a07" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Dlaczego ktoś wybiera FOMO, a nie kolejne studio motion czy design? Własnymi słowami.</span></p><textarea class="ans" id="a08" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Studia albo strony, których pozycjonowanie podziwiacie — i takie, do których nigdy nie chcielibyście być podobni?</span></p><textarea class="ans" id="a09" placeholder="Wasza odpowiedź…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="num">03</div>
+    <div>
+      <h2>Dowód i treści</h2>
+      <p class="frame">Wasze liczby sprzedają. Zróbmy je łatwe do pokazania.</p>
+      <div class="qs">
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Które case studies są gotowe do pokazania i jaką metrykę uniesie każde z nich?</span><span class="hint">Już gracie liczbami — 780k wyświetleń, 5× w 48h — pójdźmy w to mocniej.</span></p><textarea class="ans" id="a10" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Które logotypy klientów i testimoniale możemy pokazać publicznie, z nazwami?</span><span class="hint">Część ekip z krypto uważa na efekt „rekomendacji" — dobrze wiedzieć na starcie.</span></p><textarea class="ans" id="a11" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Kto pisze teksty i jakim tonem? Macie je, czy to część roboty?</span></p><textarea class="ans" id="a12" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Ustawimy powtarzalny format case study, żeby kolejne wskakiwały jako podstrony — jest jakieś wzorcowe, na którym się oprzeć?</span></p><textarea class="ans" id="a13" placeholder="Wasza odpowiedź…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="num">04</div>
+    <div>
+      <h2>Sama strona</h2>
+      <p class="frame">Sam build, odchudzony pod MVP.</p>
+      <div class="qs">
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Usługi teraz vs później — co ląduje na pierwszym landingu, a co czeka na podstrony?</span></p><textarea class="ans" id="a14" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Docelowa mapa podstron, żeby landing już od pierwszego dnia ją zapowiadał.</span></p><textarea class="ans" id="a15" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Ceny: pakiety, widełki, czy zostawiamy „pogadajmy"?</span></p><textarea class="ans" id="a16" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Zostajecie na Framerze, czy otwarci na zmianę? I kto edytuje stronę po starcie?</span></p><textarea class="ans" id="a17" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Animacja na stronie — skoro to wasz fach: ile i gdzie? Podrzućcie strony mocne w motion, które cenicie.</span></p><textarea class="ans" id="a18" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Kontakt: poza „book a call" — krótki formularz briefu, zwykły mail, konkretny terminarz?</span></p><textarea class="ans" id="a19" placeholder="Wasza odpowiedź…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="num">05</div>
+    <div>
+      <h2>Logistyka</h2>
+      <p class="frame">Nudne, ale konieczne.</p>
+      <div class="qs">
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Celujecie w jakąś datę?</span><span class="hint">launch, event, okno kampanii.</span></p><textarea class="ans" id="a20" placeholder="Wasza odpowiedź…"></textarea></div>
+        <div class="q"><p class="qtext"><span class="mk">&#x2731;</span><span class="qmain">Kto jest osobą kontaktową i kto zatwierdza — oboje, czy jedno z was?</span></p><textarea class="ans" id="a22" placeholder="Wasza odpowiedź…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="materials">
+    <div class="head">
+      <span class="label">Checklista</span>
+      <h2>Do podesłania</h2>
+    </div>
+    <ul class="checklist">
+      <li><label class="check"><input class="chk" type="checkbox" id="c1"><span class="ltext">Materiały brandowe — pliki logo, kolory, typografia, znak &#x2731;, jakiekolwiek guidelines.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c2"><span class="ltext">Dostęp do obecnego projektu we Framerze (albo export).</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c3"><span class="ltext">Logotypy klientów w dobrej jakości — ze zgodą na użycie każdego.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c4"><span class="ltext">Zebrane testimoniale — z nazwiskami, stanowiskami i zgodą.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c5"><span class="ltext">Surowce do case studies — projekty, metryki, before/after, wideo.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c6"><span class="ltext">Reel i pliki wideo — oraz gdzie chcecie je hostować.<span class="note">Są ciężkie — warto ustalić wcześnie pod szybkość ładowania.</span></span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c7"><span class="ltext">Linki do social + liczby, które warto pokazać — obserwujący, wyświetlenia.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c8"><span class="ltext">Jednozdaniowy opis każdej usługi — zaznaczcie nowe i rozszerzone.</span></label></li>
+      <li><label class="check"><input class="chk" type="checkbox" id="c9"><span class="ltext">Dwie–trzy strony-referencje, które lubicie — i parę, których nie.</span></label></li>
+    </ul>
+  </section>
+
+  <section class="submit-area">
+    <p class="savenote">Zapisuje się automatycznie w tej przeglądarce. Jak skończycie — kliknijcie poniżej; całość skopiuje się do schowka, wklejcie mi ją w mailu albo na Slacku.</p>
+    <button class="submit" id="saveBtn" type="button">Skopiuj odpowiedzi</button>
+    <p class="submit-msg" id="saveMsg" hidden></p>
+  </section>
+
+  <footer>
+    <div class="contact">
+      <span class="label">Kontakt</span>
+      <a href="mailto:hello@heksagraf.com">hello@heksagraf.com</a><br>
+      <a href="https://heksagraf.com">heksagraf.com</a>
+    </div>
+    <div class="stamp">Heksagraf · Paź 2026</div>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  var KEY='fomo-brief-';
+  function save(k,v){try{localStorage.setItem(KEY+k,v);}catch(e){}}
+  function read(k){try{return localStorage.getItem(KEY+k);}catch(e){return null;}}
+  function grow(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px';}
+
+  document.querySelectorAll('textarea.ans').forEach(function(t){
+    var v=read(t.id); if(v!=null) t.value=v;
+    grow(t);
+    t.addEventListener('input',function(){save(t.id,t.value);grow(t);});
+  });
+  document.querySelectorAll('input.chk').forEach(function(c){
+    if(read(c.id)==='1') c.checked=true;
+    c.addEventListener('change',function(){save(c.id,c.checked?'1':'0');});
+  });
+
+  function reportText(){
+    var out=['BRIEF FOMO — odpowiedzi',''];
+    document.querySelectorAll('main .section').forEach(function(sec){
+      var num=sec.querySelector('.num'), h=sec.querySelector('h2');
+      out.push((num?num.textContent.trim()+' · ':'')+(h?h.textContent.trim().toUpperCase():''));
+      sec.querySelectorAll('.q').forEach(function(q){
+        var qm=q.querySelector('.qmain'), ta=q.querySelector('textarea');
+        out.push('— '+(qm?qm.textContent.trim():''));
+        out.push((ta&&ta.value.trim())?ta.value.trim():'(—)');
+        out.push('');
+      });
+    });
+    var mat=document.querySelector('.materials');
+    if(mat){
+      out.push('DO PODESŁANIA');
+      mat.querySelectorAll('.check').forEach(function(l){
+        var cb=l.querySelector('input'), tx=l.querySelector('.ltext');
+        out.push((cb&&cb.checked?'[x] ':'[ ] ')+(tx?tx.textContent.trim():''));
+      });
+    }
+    return out.join('\n');
+  }
+
+  var btn=document.getElementById('saveBtn');
+  var msg=document.getElementById('saveMsg');
+  function show(t){ if(msg){ msg.textContent=t; msg.hidden=false; } }
+
+  function done(ok){
+    show(ok
+      ? 'Skopiowane do schowka ✓ — wklejcie mi je teraz w mailu albo na Slacku.'
+      : 'Zaznaczyłem tekst w ramce poniżej — skopiujcie go ręcznie (Ctrl/Cmd+C) i wyślijcie mi go.');
+    if(btn){ var l=btn.getAttribute('data-label')||'Skopiuj odpowiedzi';
+      btn.textContent=ok?'Skopiowane ✓':l;
+      setTimeout(function(){btn.textContent=l;},2600); }
+  }
+  function selectCopy(){
+    try{
+      var ta=document.createElement('textarea'); ta.value=reportText();
+      ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok=document.execCommand('copy'); document.body.removeChild(ta); done(ok);
+    }catch(e){ done(false); }
+  }
+  if(btn){
+    btn.setAttribute('data-label',btn.textContent);
+    btn.addEventListener('click',function(){
+      var txt=reportText();
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){done(true);}).catch(function(){selectCopy();});
+      } else { selectCopy(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>
